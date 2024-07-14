@@ -223,6 +223,11 @@ paths:
           $ref: '#/components/responses/Error'
 
 components:
+  securitySchemes:
+    ApiKeyAuth:
+      type: apiKey
+      in: header
+      name: X-API-KEY
   schemas:
     Error:
       required:
@@ -423,3 +428,6 @@ components:
       required: true
       schema:
         type: integer
+
+security:
+  - ApiKeyAuth: []
