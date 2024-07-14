@@ -6,6 +6,13 @@ info:
 servers:
   - url: 'https://localhost:8080'
 paths:
+  '/health':
+    get:
+      summary: Check the health of the service
+      operationId: health
+      responses:
+        '200':
+          description: Service is healthy
   '/tunes':
     get:
       summary: List all tunes
