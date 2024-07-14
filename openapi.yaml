@@ -242,10 +242,9 @@ components:
         message:
           type: string
     Id:
-      type: integer
       description: Unique identifier for an object
-      minimum: 1
-      format: int64
+      type: string
+      format: uuid
 
     ObjectId:
       type: object
@@ -421,13 +420,15 @@ components:
       in: path
       required: true
       schema:
-        type: integer
+        type: string
+        format: uuid
     setId:
       name: setId
       in: path
       required: true
       schema:
-        type: integer
+        type: string
+        format: uuid
 
 security:
   - ApiKeyAuth: []
