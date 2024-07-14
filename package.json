@@ -1,0 +1,13 @@
+{
+  "devDependencies": {
+    "@apisyouwonthate/style-guide": "^1.5.0"
+  },
+  "name": "limepipes-api",
+  "version": "1.0.0",
+  "description": "API definition for limepipes.",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "",
+  "license": "ISC"
+}
