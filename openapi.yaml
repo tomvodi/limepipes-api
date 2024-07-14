@@ -6,6 +6,13 @@ info:
 servers:
   - url: 'https://localhost:8080'
 paths:
+  '/':
+    get:
+      summary: Welcome to the Set and Tune API
+      operationId: home
+      responses:
+        '200':
+          description: Welcome message
   '/health':
     get:
       summary: Check the health of the service
