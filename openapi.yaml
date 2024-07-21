@@ -19,7 +19,9 @@ paths:
       operationId: health
       responses:
         '200':
-          description: Service is healthy
+          $ref: '#/components/responses/Health'
+        '503':
+          description: Service Unavailable
   '/tunes':
     get:
       summary: List all tunes
@@ -352,8 +354,9 @@ components:
       items:
         $ref: '#/components/schemas/Id'
       example:
-        [1, 2, 3]
-
+        - e4635d0e-3101-4c7e-a84b-7271dea0834e
+        - d8686947-5e7b-4d26-b7e6-cbaaded2405a
+        - a243cd85-45fb-4940-bad6-549cab3f096f
     ImportTune:
       allOf:
         - $ref: '#/components/schemas/Tune'
@@ -363,7 +366,7 @@ components:
               $ref: '#/components/schemas/BasicMusicSet'
             importedToDatabase:
               type: boolean
-              description: true, if tune was imported into database, false if a tune with this title was already there
+              description: 'true, if tune was imported into database, false if a tune with this title was already there'
             warnings:
               type: array
               items:
@@ -393,13 +396,18 @@ components:
         result:
           $ref: '#/components/schemas/ParseResult'
         tunes:
-          description: if import was successful, the array of imported tunes
+          description: 'if import was successful, the array of imported tunes'
           type: array
           items:
             $ref: '#/components/schemas/ImportTune'
       required:
         - name
-
+    HealthStatus:
+      title: HealthStatus
+      enum:
+        - up
+        - down
+      readOnly: true
   responses:
     Error:
       description: General error for the service
@@ -427,7 +435,33 @@ components:
             type: array
             items:
               $ref: '#/components/schemas/ImportFile'
-
+    Health:
+      description: Health response
+      content:
+        application/json:
+          schema:
+            type: object
+            x-examples:
+              Example 1:
+                status: up
+                details:
+                  database:
+                    status: up
+                    timestamp: '2024-07-21T13:14:18.973593348Z'
+            properties:
+              status:
+                $ref: '#/components/schemas/HealthStatus'
+              details:
+                type: object
+                properties:
+                  database:
+                    type: object
+                    properties:
+                      status:
+                        $ref: '#/components/schemas/HealthStatus'
+                      timestamp:
+                        type: string
+                        format: date-time
   parameters:
     tuneId:
       name: tuneId
