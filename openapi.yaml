@@ -452,14 +452,9 @@ components:
     Error:
       type: object
       properties:
-        code:
-          type: integer
-          description: HTTP status code
-          format: int32
         message:
           type: string
       required:
-        - code
         - message
     ImportFile:
       type: object
