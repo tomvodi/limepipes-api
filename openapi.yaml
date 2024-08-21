@@ -467,8 +467,6 @@ components:
         name:
           type: string
           description: the imported filename
-        result:
-          $ref: '#/components/schemas/ParseResult'
         set:
           $ref: '#/components/schemas/BasicMusicSet'
         tunes:
@@ -478,13 +476,6 @@ components:
             $ref: '#/components/schemas/ImportTune'
       required:
         - name
-    ParseResult:
-      type: object
-      properties:
-        success:
-          type: boolean
-        message:
-          type: string
     BasicMusicSet:
       allOf:
         - $ref: '#/components/schemas/ObjectId'
