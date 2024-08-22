@@ -483,9 +483,6 @@ components:
       type: object
       title: ImportInfo
       properties:
-        alreadyImported:
-          type: boolean
-          description: true if entity was already imported
         warnings:
           type: array
           items:
