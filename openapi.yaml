@@ -1,19 +1,23 @@
 openapi: 3.0.0
 info:
+  version: 1.0.0
   title: Set and Tune API
   description: API for managing sets and tunes
-  version: 1.0.0
 servers:
   - url: 'https://localhost:8080'
 paths:
-  '/':
+  /:
     get:
       summary: Welcome to the Set and Tune API
       operationId: home
       responses:
         '200':
           description: Welcome message
-  '/health':
+      security:
+        - ApiKeyAuth: []
+      servers:
+        - url: 'https://localhost:8080'
+  /health:
     get:
       summary: Check the health of the service
       operationId: health
@@ -22,7 +26,11 @@ paths:
           $ref: '#/components/responses/Health'
         '503':
           description: Service Unavailable
-  '/tunes':
+      security:
+        - ApiKeyAuth: []
+      servers:
+        - url: 'https://localhost:8080'
+  /tunes:
     get:
       summary: List all tunes
       operationId: listTunes
@@ -37,6 +45,10 @@ paths:
                   $ref: '#/components/schemas/Tune'
         default:
           $ref: '#/components/responses/Error'
+      security:
+        - ApiKeyAuth: []
+      servers:
+        - url: 'https://localhost:8080'
     post:
       summary: Create a new tune
       operationId: createTune
@@ -58,6 +70,10 @@ paths:
           $ref: '#/components/responses/InvalidInput'
         default:
           $ref: '#/components/responses/Error'
+      security:
+        - ApiKeyAuth: []
+      servers:
+        - url: 'https://localhost:8080'
   '/tunes/{tuneId}':
     get:
       summary: Get a tune by ID
@@ -75,6 +91,10 @@ paths:
           $ref: '#/components/responses/NotFound'
         default:
           $ref: '#/components/responses/Error'
+      security:
+        - ApiKeyAuth: []
+      servers:
+        - url: 'https://localhost:8080'
     put:
       summary: Update a tune by ID
       operationId: updateTune
@@ -90,11 +110,14 @@ paths:
       responses:
         '204':
           description: The tune was updated
-          content: {}
         '404':
           $ref: '#/components/responses/NotFound'
         default:
           $ref: '#/components/responses/Error'
+      security:
+        - ApiKeyAuth: []
+      servers:
+        - url: 'https://localhost:8080'
     delete:
       summary: Delete a tune by ID
       operationId: deleteTune
@@ -103,12 +126,15 @@ paths:
       responses:
         '204':
           description: Tune deleted
-          content: {}
         '404':
           $ref: '#/components/responses/NotFound'
         default:
           $ref: '#/components/responses/Error'
-  '/sets':
+      security:
+        - ApiKeyAuth: []
+      servers:
+        - url: 'https://localhost:8080'
+  /sets:
     get:
       summary: List all sets
       operationId: listSets
@@ -123,6 +149,10 @@ paths:
                   $ref: '#/components/schemas/MusicSet'
         default:
           $ref: '#/components/responses/Error'
+      security:
+        - ApiKeyAuth: []
+      servers:
+        - url: 'https://localhost:8080'
     post:
       summary: Create a new set
       operationId: createSet
@@ -144,6 +174,10 @@ paths:
           $ref: '#/components/responses/InvalidInput'
         default:
           $ref: '#/components/responses/Error'
+      security:
+        - ApiKeyAuth: []
+      servers:
+        - url: 'https://localhost:8080'
   '/sets/{setId}':
     get:
       summary: Get a set by ID
@@ -161,6 +195,10 @@ paths:
           $ref: '#/components/responses/NotFound'
         default:
           $ref: '#/components/responses/Error'
+      security:
+        - ApiKeyAuth: []
+      servers:
+        - url: 'https://localhost:8080'
     put:
       summary: Update a set by ID
       operationId: updateSet
@@ -176,11 +214,14 @@ paths:
       responses:
         '204':
           description: The updated set
-          content: {}
         '404':
           $ref: '#/components/responses/NotFound'
         default:
           $ref: '#/components/responses/Error'
+      security:
+        - ApiKeyAuth: []
+      servers:
+        - url: 'https://localhost:8080'
     delete:
       summary: Delete a set by ID
       operationId: deleteSet
@@ -193,6 +234,10 @@ paths:
           $ref: '#/components/responses/NotFound'
         default:
           $ref: '#/components/responses/Error'
+      security:
+        - ApiKeyAuth: []
+      servers:
+        - url: 'https://localhost:8080'
   '/sets/{setId}/tunes':
     put:
       summary: Assign tunes to a set
@@ -217,197 +262,53 @@ paths:
           $ref: '#/components/responses/NotFound'
         default:
           $ref: '#/components/responses/Error'
-  '/imports/bww':
+      security:
+        - ApiKeyAuth: []
+      servers:
+        - url: 'https://localhost:8080'
+  /imports:
     post:
-      summary: Import tunes/sets from one or more bww files
-      operationId: importBww
+      summary: Import tunes/sets from a file
+      operationId: importFile
       requestBody:
         content:
           multipart/form-data:
             schema:
               type: object
               properties:
-                filename:
-                  type: array
-                  items:
-                    type: string
-                    format: binary
+                file:
+                  type: string
+                  format: binary
       responses:
-        '200':
+        '201':
           $ref: '#/components/responses/Import'
         default:
           $ref: '#/components/responses/Error'
-
+      security:
+        - ApiKeyAuth: []
+      servers:
+        - url: 'https://localhost:8080'
 components:
+  parameters:
+    tuneId:
+      name: tuneId
+      in: path
+      required: true
+      schema:
+        type: string
+        format: uuid
+    setId:
+      name: setId
+      in: path
+      required: true
+      schema:
+        type: string
+        format: uuid
   securitySchemes:
     ApiKeyAuth:
       type: apiKey
-      in: header
       name: X-API-KEY
-  schemas:
-    Error:
-      required:
-        - code
-        - message
-      type: object
-      properties:
-        code:
-          description: HTTP status code
-          type: integer
-          format: int32
-        message:
-          type: string
-    Id:
-      description: Unique identifier for an object
-      type: string
-      format: uuid
-
-    ObjectId:
-      type: object
-      properties:
-        id:
-          $ref: '#/components/schemas/Id'
-      required:
-        - id
-
-    BasicSetProperties:
-      type: object
-      properties:
-        title:
-          type: string
-          description: The name of the Set
-        description:
-          type: string
-          description: A description of the Set
-        creator:
-          type: string
-          description: The name of the creator of the set
-      required:
-        - title
-
-    SetProperties:
-      type: object
-      allOf:
-        - $ref: '#/components/schemas/BasicSetProperties'
-        - type: object
-          properties:
-            tunes:
-              type: array
-              items:
-                $ref: '#/components/schemas/Tune'
-
-    CreateUpdateSetProperties:
-      type: object
-      allOf:
-        - $ref: '#/components/schemas/BasicSetProperties'
-        - type: object
-          properties:
-            tunes:
-              $ref: '#/components/schemas/TuneIdList'
-
-    BasicMusicSet:
-      allOf:
-        - $ref: '#/components/schemas/ObjectId'
-        - $ref: '#/components/schemas/BasicSetProperties'
-
-    MusicSet:
-      description: Called MusicSet and not only Set because of name clash in e.g. typescript
-      allOf:
-        - $ref: '#/components/schemas/ObjectId'
-        - $ref: '#/components/schemas/SetProperties'
-    CreateSet:
-      allOf:
-        - $ref: '#/components/schemas/CreateUpdateSetProperties'
-    UpdateSet:
-      allOf:
-        - $ref: '#/components/schemas/CreateUpdateSetProperties'
-
-    TuneProperties:
-      type: object
-      properties:
-        title:
-          type: string
-        type:
-          type: string
-        timeSig:
-          type: string
-        composer:
-          type: string
-        arranger:
-          type: string
-      required:
-        - title
-    Tune:
-      allOf:
-        - $ref: '#/components/schemas/ObjectId'
-        - $ref: '#/components/schemas/TuneProperties'
-
-    CreateTune:
-      allOf:
-        - $ref: '#/components/schemas/TuneProperties'
-    UpdateTune:
-      allOf:
-        - $ref: '#/components/schemas/TuneProperties'
-
-    TuneIdList:
-      type: array
-      items:
-        $ref: '#/components/schemas/Id'
-      example:
-        - e4635d0e-3101-4c7e-a84b-7271dea0834e
-        - d8686947-5e7b-4d26-b7e6-cbaaded2405a
-        - a243cd85-45fb-4940-bad6-549cab3f096f
-    ImportTune:
-      allOf:
-        - $ref: '#/components/schemas/Tune'
-        - type: object
-          properties:
-            set:
-              $ref: '#/components/schemas/BasicMusicSet'
-            importedToDatabase:
-              type: boolean
-              description: 'true, if tune was imported into database, false if a tune with this title was already there'
-            warnings:
-              type: array
-              items:
-                type: string
-            errors:
-              type: array
-              items:
-                type: string
-            infos:
-              type: array
-              items:
-                type: string
-
-    ParseResult:
-      type: object
-      properties:
-        success:
-          type: boolean
-        message:
-          type: string
-
-    ImportFile:
-      type: object
-      properties:
-        name:
-          type: string
-        result:
-          $ref: '#/components/schemas/ParseResult'
-        tunes:
-          description: 'if import was successful, the array of imported tunes'
-          type: array
-          items:
-            $ref: '#/components/schemas/ImportTune'
-      required:
-        - name
-    HealthStatus:
-      title: HealthStatus
-      enum:
-        - up
-        - down
-      readOnly: true
+      in: header
   responses:
     Error:
       description: General error for the service
@@ -428,26 +329,17 @@ components:
           schema:
             $ref: '#/components/schemas/Error'
     Import:
-      description: Information about an import of one or more files
+      description: Information about an import of one file
       content:
         application/json:
           schema:
-            type: array
-            items:
-              $ref: '#/components/schemas/ImportFile'
+            $ref: '#/components/schemas/ImportFile'
     Health:
       description: Health response
       content:
         application/json:
           schema:
             type: object
-            x-examples:
-              Example 1:
-                status: up
-                details:
-                  database:
-                    status: up
-                    timestamp: '2024-07-21T13:14:18.973593348Z'
             properties:
               status:
                 $ref: '#/components/schemas/HealthStatus'
@@ -462,21 +354,153 @@ components:
                       timestamp:
                         type: string
                         format: date-time
-  parameters:
-    tuneId:
-      name: tuneId
-      in: path
-      required: true
-      schema:
-        type: string
-        format: uuid
-    setId:
-      name: setId
-      in: path
-      required: true
-      schema:
-        type: string
-        format: uuid
-
+            x-examples:
+              Example 1:
+                status: up
+                details:
+                  database:
+                    status: up
+                    timestamp: '2024-07-21T13:14:18.973593348Z'
+  schemas:
+    Tune:
+      allOf:
+        - $ref: '#/components/schemas/ObjectId'
+        - $ref: '#/components/schemas/TuneProperties'
+    ObjectId:
+      type: object
+      properties:
+        id:
+          $ref: '#/components/schemas/Id'
+      required:
+        - id
+    Id:
+      type: string
+      description: Unique identifier for an object
+      format: uuid
+    TuneProperties:
+      type: object
+      properties:
+        title:
+          type: string
+        type:
+          type: string
+        timeSig:
+          type: string
+        composer:
+          type: string
+        arranger:
+          type: string
+      required:
+        - title
+    CreateTune:
+      allOf:
+        - $ref: '#/components/schemas/TuneProperties'
+    UpdateTune:
+      allOf:
+        - $ref: '#/components/schemas/TuneProperties'
+    MusicSet:
+      description: Called MusicSet and not only Set because of name clash in e.g. typescript
+      allOf:
+        - $ref: '#/components/schemas/ObjectId'
+        - $ref: '#/components/schemas/SetProperties'
+    SetProperties:
+      type: object
+      allOf:
+        - $ref: '#/components/schemas/BasicSetProperties'
+        - type: object
+          properties:
+            tunes:
+              type: array
+              items:
+                $ref: '#/components/schemas/Tune'
+    BasicSetProperties:
+      type: object
+      properties:
+        title:
+          type: string
+          description: The name of the Set
+        description:
+          type: string
+          description: A description of the Set
+        creator:
+          type: string
+          description: The name of the creator of the set
+      required:
+        - title
+    CreateSet:
+      allOf:
+        - $ref: '#/components/schemas/CreateUpdateSetProperties'
+    CreateUpdateSetProperties:
+      type: object
+      allOf:
+        - $ref: '#/components/schemas/BasicSetProperties'
+        - type: object
+          properties:
+            tunes:
+              $ref: '#/components/schemas/TuneIdList'
+    TuneIdList:
+      type: array
+      items:
+        $ref: '#/components/schemas/Id'
+      example:
+        - e4635d0e-3101-4c7e-a84b-7271dea0834e
+        - d8686947-5e7b-4d26-b7e6-cbaaded2405a
+        - a243cd85-45fb-4940-bad6-549cab3f096f
+    UpdateSet:
+      allOf:
+        - $ref: '#/components/schemas/CreateUpdateSetProperties'
+    Error:
+      type: object
+      properties:
+        message:
+          type: string
+      required:
+        - message
+    ImportFile:
+      type: object
+      properties:
+        name:
+          type: string
+          description: the imported filename
+        set:
+          $ref: '#/components/schemas/BasicMusicSet'
+        tunes:
+          type: array
+          description: 'if import was successful, the array of imported tunes'
+          items:
+            $ref: '#/components/schemas/ImportTune'
+      required:
+        - name
+    BasicMusicSet:
+      allOf:
+        - $ref: '#/components/schemas/ObjectId'
+        - $ref: '#/components/schemas/BasicSetProperties'
+    ImportTune:
+      allOf:
+        - $ref: '#/components/schemas/Tune'
+        - $ref: '#/components/schemas/ImportInfo'
+    ImportInfo:
+      type: object
+      title: ImportInfo
+      properties:
+        warnings:
+          type: array
+          items:
+            type: string
+        errors:
+          type: array
+          items:
+            type: string
+        infos:
+          type: array
+          items:
+            type: string
+    HealthStatus:
+      type: string
+      enum:
+        - up
+        - down
+      title: HealthStatus
+      readOnly: true
 security:
   - ApiKeyAuth: []
